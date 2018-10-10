@@ -19,22 +19,35 @@ import java.util.List;
  * date:2018/10/9
  * description: server 
  */
-public class NioServer {
-    private ServerSocketChannel serverSocketChannel;
+public class NioClient {
+    private SocketChannel socketChannel;
     private Selector selector;
     
     
-    public void NioServer() throws IOException{
-        serverSocketChannel = ServerSocketChannel.open();
+    public void NioClient() throws IOException{
+        socketChannel = SocketChannel.open();
         //必须设置成非阻塞的
-        serverSocketChannel.configureBlocking(false);
-        
-        serverSocketChannel.socket().bind(new InetSocketAddress(8080));
+        socketChannel.configureBlocking(false);
+
+//        socketChannel.socket().bind(new InetSocketAddress(8080));
         //创建selector
         selector = Selector.open();
-        serverSocketChannel.register(selector, SelectionKey.OP_ACCEPT);
+        socketChannel.register(selector, SelectionKey.OP_CONNECT);
+
+        socketChannel.connect(new InetSocketAddress(8080));
         System.out.println("链接成功");
         handleKeys();
+
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    handleKeys();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }).start();
         
         
     }
@@ -83,7 +96,7 @@ public class NioServer {
         ByteBuffer byteBuffer = CodeUtils.read(socketChannel);
         if(byteBuffer == null){
             System.out.println("处理结束");
-            serverSocketChannel.register(selector,0);
+            socketChannel.register(selector,0);
             return;
         }
         if(byteBuffer.position()>0){
