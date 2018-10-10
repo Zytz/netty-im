@@ -24,16 +24,17 @@ public class NioServer {
     private Selector selector;
     
     
-    public void NioServer() throws IOException{
+    public  NioServer()  throws IOException {
+
         serverSocketChannel = ServerSocketChannel.open();
         //必须设置成非阻塞的
         serverSocketChannel.configureBlocking(false);
         
-        serverSocketChannel.socket().bind(new InetSocketAddress(8080));
+        serverSocketChannel.socket().bind(new InetSocketAddress(8081));
         //创建selector
         selector = Selector.open();
         serverSocketChannel.register(selector, SelectionKey.OP_ACCEPT);
-        System.out.println("链接成功");
+        System.out.println("server start up OK ");
         handleKeys();
         
         
@@ -96,10 +97,10 @@ public class NioServer {
     }
 
     private void handleAcceptkey(SelectionKey key) throws IOException{
-        ServerSocketChannel serverSocketChannel = ServerSocketChannel.open();
+        SocketChannel serverSocketChannel = ((ServerSocketChannel)key.channel()).accept();
         serverSocketChannel.configureBlocking(false);
         //注册客户端的client
-        serverSocketChannel.register(selector,SelectionKey.OP_READ,new ArrayList<>());
+        serverSocketChannel.register(selector,SelectionKey.OP_READ,new ArrayList<String>());
     }
 
 }
