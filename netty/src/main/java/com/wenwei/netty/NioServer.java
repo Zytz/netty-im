@@ -42,7 +42,7 @@ public class NioServer {
 
     private void handleKeys() throws IOException{
         while (true){
-            int selectNums = selector.select(3000L);
+            int selectNums = selector.select(30*1000L);
             if (selectNums == 0){
                 continue;
             }
@@ -61,9 +61,11 @@ public class NioServer {
     private void handleKey(SelectionKey key) throws IOException{
         if(key.isAcceptable()){
             handleAcceptkey(key);
-        }else if (key.isReadable()){
+        }
+        if (key.isReadable()){
             handleReadKey(key);
-        }else if (key.isWritable()){
+        }
+        if (key.isWritable()){
             handleWriteKey(key);
         }
     }
@@ -75,6 +77,7 @@ public class NioServer {
             System.out.println("响应数据 ："+s);
             CodeUtils.write(clientSocketChannel,s);
         }
+        responseQueue.clear();
         clientSocketChannel.register(selector,SelectionKey.OP_READ,responseQueue);
     }
 
@@ -84,7 +87,7 @@ public class NioServer {
         ByteBuffer byteBuffer = CodeUtils.read(socketChannel);
         if(byteBuffer == null){
             System.out.println("处理结束");
-            serverSocketChannel.register(selector,0);
+            socketChannel.register(selector,0);
             return;
         }
         if(byteBuffer.position()>0){

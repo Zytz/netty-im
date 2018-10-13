@@ -80,11 +80,13 @@ public class NioClient {
     }
 
     private void handleKey(SelectionKey key) throws IOException{
-        if(key.isAcceptable()){
+        if(key.isConnectable()){
             handleConnectableKey(key);
-        }else if (key.isReadable()){
+        }
+        if (key.isReadable()){
             handleReadKey(key);
-        }else if (key.isWritable()){
+        }
+        if (key.isWritable()){
             handleWriteKey(key);
         }
     }
